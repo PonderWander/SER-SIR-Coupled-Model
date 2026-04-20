@@ -1,0 +1,208 @@
+## Intervention Layer Configuration
+## Exogenous elasticity inflow: E_{i,t+1} += ω_i * H_t
+## H_t = A_t * G_t
+##
+## ELASTICITY UPPER-BOUND: raised from 1.0 → 1.30 (soft-cap zone).
+## Diminishing-returns (1-E_t) headroom goes negative above 1.0,
+## providing natural saturation. Hard clip at 1.30 ensures stability.
+
+intervention:
+
+  active_scenario: "medium"
+
+  scenarios:
+
+    baseline:
+      label:        "Baseline (no intervention)"
+      t_start:      99
+      A_max:        0.0
+      k:            0.3
+      t0:           12
+      G_base:       0.0
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: []
+
+    low:
+      label:        "Low (prior inflow)"
+      t_start:      6
+      A_max:        0.10
+      k:            0.25
+      t0:           12
+      G_base:       0.04
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: ["generic"]
+
+    medium:
+      label:        "Medium (prior inflow)"
+      t_start:      6
+      A_max:        0.22
+      k:            0.35
+      t0:           10
+      G_base:       0.06
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: ["generic"]
+
+    high:
+      label:        "High (prior inflow)"
+      t_start:      6
+      A_max:        0.40
+      k:            0.45
+      t0:           8
+      G_base:       0.08
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: ["generic"]
+
+    food_only:
+      label:        "Food-linked household inflow only"
+      t_start:      3
+      A_max:        0.60
+      k:            0.30
+      t0:           10
+      G_base:       0.042
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: ["food"]
+
+    filter_only:
+      label:        "Filtration-linked (expanded burden basis)"
+      t_start:      3
+      A_max:        0.40
+      k:            0.20
+      t0:           14
+      G_base:       0.076
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: ["filter"]
+
+    food_and_filter:
+      label:        "Food + Filtration (expanded)"
+      t_start:      3
+      A_max:        0.60
+      k:            0.30
+      t0:           10
+      G_base:       0.042
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: ["food", "filter"]
+
+    medium_and_food:
+      label:        "Medium (prior) + Food"
+      t_start:      6
+      A_max:        0.22
+      k:            0.35
+      t0:           10
+      G_base:       0.06
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: ["generic", "food"]
+
+    medium_and_filter:
+      label:        "Medium (prior) + Filtration (expanded)"
+      t_start:      6
+      A_max:        0.22
+      k:            0.35
+      t0:           10
+      G_base:       0.06
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: ["generic", "filter"]
+
+    medium_food_filter:
+      label:        "Medium (prior) + Food + Filtration (expanded)"
+      t_start:      6
+      A_max:        0.22
+      k:            0.35
+      t0:           10
+      G_base:       0.06
+      seasonal_amp: 0.0
+      season_offset: 0
+      sources: ["generic", "food", "filter"]
+
+  sources:
+    generic:
+      use_scenario_params: true
+    food:
+      t_start:  3
+      A_max:    0.60
+      k:        0.30
+      t0:       10
+      G_base:   0.042
+    filter:
+      t_start:  3
+      A_max:    0.40
+      k:        0.20
+      t0:       14
+      G_base:   0.076
+      # ── Expanded burden basis (recalibrated from narrow proxy) ──────────
+      # Previous basis: waterborne illness only → $3.3B/year (CDC)
+      # Expanded basis: broader contamination-related illness + disruption
+      #
+      #   Component                               Est. $/year (US)
+      #   Waterborne illness (CDC Collier 2023)   $3.3B
+      #   Food/irrigation water contamination     $3.0B  (15% of Scharff 2020 foodborne)
+      #   GI productivity loss (water-linked)     $9.0B  (~20% of 179M GI days × $250)
+      #   Boil-water / advisory household costs   $0.6B  (EPA/AWWA advisory database)
+      #   Healthcare system burden (ORS/labs)     $1.1B  (EPA Safe Drinking Water study)
+      #   ────────────────────────────────────────────────
+      #   EXPANDED TOTAL                          $17.0B/year
+      #   Expansion ratio vs narrow:              5.15×
+      #
+      # Recalibration:
+      #   $17.0B / 331M pop / 12 = $4.28/person/month
+      #   × 2.5 persons/HH = $10.70/HH/month
+      #   ÷ $500 HH healthcare baseline = fraction 0.02140/month
+      #   × elasticity-scale factor 3.57 = G_filter = 0.0764 → rounded 0.076
+      #   A_max = 0.40 unchanged (adoption ramp unaffected by burden basis)
+      #   H_filter_max = 0.40 × 0.076 = 0.0304
+
+  sector_weights:
+    food_at_home:            0.70
+    food_away_from_home:     0.55
+    energy:                  0.80
+    gasoline:                0.75
+    electricity:             0.60
+    shelter:                 0.30
+    transportation_services: 0.85
+    household_goods:         0.65
+    medical_services:        0.45
+    apparel:                 0.50
+    ppi_goods:               0.70
+    ppi_food:                0.65
+    ppi_energy:              0.80
+
+  food_weights:
+    food_at_home:            0.90
+    food_away_from_home:     0.60
+    energy:                  0.20
+    gasoline:                0.25
+    electricity:             0.15
+    shelter:                 0.20
+    transportation_services: 0.40
+    household_goods:         0.75
+    medical_services:        0.20
+    apparel:                 0.30
+    ppi_goods:               0.25
+    ppi_food:                0.70
+    ppi_energy:              0.15
+
+  filter_weights:
+    food_at_home:            0.30
+    food_away_from_home:     0.25
+    energy:                  0.10
+    gasoline:                0.05
+    electricity:             0.10
+    shelter:                 0.35
+    transportation_services: 0.10
+    household_goods:         0.45
+    medical_services:        0.85
+    apparel:                 0.10
+    ppi_goods:               0.10
+    ppi_food:                0.25
+    ppi_energy:              0.05
+
+  secondary_clearance: false
+  clearance_boost_fraction: 0.20

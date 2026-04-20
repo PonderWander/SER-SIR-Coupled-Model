@@ -1,0 +1,159 @@
+## Base Configuration for Epidemic-Market Simulation
+## Coupled SIR + SER Research Pipeline
+
+run:
+  name: "baseline_covid_reconstruction"
+  seed: 42
+  start_date: "2020-01-01"
+  end_date: "2022-12-31"
+  freq: "M"
+  description: "Baseline COVID-era reconstruction using observed CPI/FRED data"
+
+data:
+  cache_dir: "data/raw"
+  processed_dir: "data/processed"
+  use_cache: true
+  fred_api_key: null
+
+  sources:
+    covid:
+      type: "owid"
+      url: "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv"
+      country: "USA"
+      columns: ["date","new_cases_smoothed","new_deaths_smoothed","hosp_patients","people_vaccinated","stringency_index"]
+
+    cpi:
+      type: "fred"
+      series:
+        food_at_home:            "CPIFABSL"
+        food_away_from_home:     "CPIUFDNS"
+        energy:                  "CPIENGSL"
+        gasoline:                "GASREGCOVW"
+        electricity:             "APU000072610"
+        shelter:                 "CUSR0000SAH1"
+        transportation_services: "CPITRNSL"
+        household_goods:         "CUSR0000SACL1E"
+        medical_services:        "CPIMEDSL"
+        apparel:                 "CPIAPPSL"
+        ppi_goods:               "WPUFD49207"
+        ppi_food:                "WPU01"
+        ppi_energy:              "WPU0543"
+
+    efficiency_proxies:
+      type: "fred"
+      series:
+        inventory_sales_ratio:    "ISRATIO"
+        industrial_utilization:   "TCU"
+        unemployment_rate:        "UNRATE"
+        initial_claims:           "ICSA"
+        freight_tsi:              "TSIFRGHT"
+        retail_inventories:       "RETAILIMSA"
+        mfg_inventories:          "MNFCTRIRSA"
+
+epidemic:
+  model: "sir"
+  population: 331000000
+  mode: "observed"
+  sir_params:
+    beta_init: 0.25
+    gamma_init: 0.07
+    beta_min: 0.05
+    beta_max: 0.8
+    smoothing_window: 14
+  normalize_pressure: true
+  pressure_lag_days: 14
+
+ser:
+  default_weights:
+    w_price:      0.35
+    w_volatility: 0.20
+    w_efficiency: 0.20
+    w_covid:      0.15
+    w_shortage:   0.10
+
+  elasticity:
+    alpha: 0.25
+    beta_L: 0.60
+    beta_S: 0.00
+    chi: 0.18
+    delta: 0.06
+    gamma_dL: 0.30
+    S_drain_thresh: 0.40
+    E_init: 0.35
+    E_crit: 0.25
+    adaptive: false
+    adapt_window: 6
+    adapt_penalty: 0.4
+
+  reaction:
+    a: 0.4
+    b: 0.3
+    gamma_R: 0.5
+    noise_std: 0.02
+
+  absorption:
+    k_E: 1.5
+    k_theta: 0.5
+
+  volatility_window: 3
+
+graph:
+  definition_file: "configs/sector_graph.yaml"
+  propagation_mode: "blended"
+  lambda_base: 0.3
+  blended_weights:
+    a_p: 0.5
+    b_p: 0.5
+
+  # ── Dynamic connectivity state C_{ij,t} ──────────────────────────────────
+  # Replaces the old heuristic w_tilde with an explicit evolving edge state.
+  # W_{ij,t} = W^0_{ij} * C_{ij,t}
+  # W^0_{ij} = structural prior (from sector_graph.yaml weights)
+  connectivity:
+    mode: "stress_elasticity_activity"  # persistence_only | stress_elasticity_activity | delta_deformation
+    rho_c: 0.25           # persistence weight (higher = slower adaptation)
+    C_init: 1.0           # initial C_{ij,t} as fraction of structural prior
+    C_floor: 0.05         # minimum connectivity (never fully severs)
+    C_ceil: 1.20          # maximum (allows modest amplification above prior)
+    kappa: 2.0            # delta_deformation divergence sensitivity
+    store_edge_history: true   # persist full C_{ij,t} series to outputs
+    flatness_warn_threshold: 0.02  # warn if C_ij std < this across time
+
+  headroom_floor: 0.05
+
+regime:
+  dispersal:
+    leaked_stress_max: 0.2
+    elasticity_min: 0.35
+  accumulation:
+    leaked_stress_min: 0.2
+    retention_min: 0.3
+  isolation:
+    effective_connectivity_max: 0.2
+  recovery:
+    leaked_stress_trend: "falling"
+    elasticity_trend: "rising"
+  fragmented:
+    effective_connectivity_max: 0.15
+
+outputs:
+  dir: "outputs"
+  parquet: true
+  csv: true
+  figures: true
+  figure_dpi: 150
+
+dashboard:
+  port: 8501
+  debug: false
+  default_sector: "energy"
+  default_date_range: ["2020-01-01", "2022-12-31"]
+
+# ── Blob / IO analytics ───────────────────────────────────────────────────────
+blob:
+  enabled: true
+  bea_io_path: "data/raw/bea/use_table_2017.csv"   # set after manual download
+  oi_spend_path: "data/raw/oi/affinity_national_weekly.csv"  # set after git clone
+  use_synthetic_activity: true   # fallback to stress-derived activity proxy
+  flatness_warn_threshold: 0.02  # inherited from connectivity
+

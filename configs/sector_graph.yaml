@@ -1,0 +1,187 @@
+## Sector Graph Definition
+## Directed weighted edges: source -> target
+## weight: structural transmission strength [0,1]
+## notes: rationale for edge
+
+sectors:
+  - food_at_home
+  - food_away_from_home
+  - energy
+  - gasoline
+  - electricity
+  - shelter
+  - transportation_services
+  - household_goods
+  - medical_services
+  - apparel
+
+edges:
+  # Energy -> downstream consumers
+  - source: energy
+    target: transportation_services
+    weight: 0.65
+    note: "Fuel is primary transport input cost"
+
+  - source: energy
+    target: household_goods
+    weight: 0.45
+    note: "Energy embedded in manufacturing and logistics"
+
+  - source: energy
+    target: food_at_home
+    weight: 0.40
+    note: "Energy in food production, cold chain, logistics"
+
+  - source: energy
+    target: food_away_from_home
+    weight: 0.35
+    note: "Energy in restaurant operations and food delivery"
+
+  - source: energy
+    target: electricity
+    weight: 0.70
+    note: "Natural gas and fuel oil are primary electricity inputs"
+
+  - source: energy
+    target: shelter
+    weight: 0.25
+    note: "Heating costs pass through to shelter costs with lag"
+
+  # Gasoline -> transport and food logistics
+  - source: gasoline
+    target: transportation_services
+    weight: 0.70
+    note: "Direct fuel cost for transport"
+
+  - source: gasoline
+    target: food_at_home
+    weight: 0.35
+    note: "Last-mile delivery cost"
+
+  - source: gasoline
+    target: food_away_from_home
+    weight: 0.30
+    note: "Supply chain delivery costs"
+
+  # Transportation -> downstream distribution-dependent sectors
+  - source: transportation_services
+    target: food_at_home
+    weight: 0.55
+    note: "Grocery supply chain critically dependent on freight"
+
+  - source: transportation_services
+    target: household_goods
+    weight: 0.60
+    note: "Manufactured goods depend on freight/logistics"
+
+  - source: transportation_services
+    target: food_away_from_home
+    weight: 0.40
+    note: "Restaurant supply chain"
+
+  - source: transportation_services
+    target: medical_services
+    weight: 0.25
+    note: "Medical supply logistics and equipment delivery"
+
+  # Electricity -> shelter, household operations
+  - source: electricity
+    target: shelter
+    weight: 0.30
+    note: "Utility costs embedded in housing"
+
+  - source: electricity
+    target: household_goods
+    weight: 0.30
+    note: "Manufacturing energy costs"
+
+  # Food at home -> food away (upstream/input similarity)
+  - source: food_at_home
+    target: food_away_from_home
+    weight: 0.45
+    note: "Restaurant inputs overlap heavily with grocery commodities"
+
+  # Shelter -> medical and food away (labor cost sharing via housing cost)
+  - source: shelter
+    target: medical_services
+    weight: 0.20
+    note: "Labor cost / wage pressures transmitted via housing costs"
+
+  - source: shelter
+    target: food_away_from_home
+    weight: 0.15
+    note: "Labor/overhead costs"
+
+  # Household goods -> food at home (packaging, containers)
+  - source: household_goods
+    target: food_at_home
+    weight: 0.20
+    note: "Packaging materials and household staples"
+
+  # Medical -> labor market feedback
+  - source: medical_services
+    target: food_away_from_home
+    weight: 0.10
+    note: "Labor market competition (healthcare vs food service workers)"
+
+# Sector metadata
+sector_metadata:
+  food_at_home:
+    category: "consumer_staple"
+    epidemic_sensitivity: "high"     # demand shock + supply disruption
+    elasticity_profile: "medium"
+    covid_lag_months: 1
+
+  food_away_from_home:
+    category: "consumer_discretionary_staple"
+    epidemic_sensitivity: "very_high"  # direct lockdown impact
+    elasticity_profile: "low"
+    covid_lag_months: 0
+
+  energy:
+    category: "commodity"
+    epidemic_sensitivity: "high"     # demand collapse then supply constraint
+    elasticity_profile: "low"
+    covid_lag_months: 0
+
+  gasoline:
+    category: "commodity"
+    epidemic_sensitivity: "very_high"
+    elasticity_profile: "very_low"
+    covid_lag_months: 0
+
+  electricity:
+    category: "utility"
+    epidemic_sensitivity: "medium"
+    elasticity_profile: "medium_high"
+    covid_lag_months: 1
+
+  shelter:
+    category: "consumer_staple"
+    epidemic_sensitivity: "low_medium"
+    elasticity_profile: "high"       # slow-moving inertia
+    covid_lag_months: 3
+
+  transportation_services:
+    category: "service"
+    epidemic_sensitivity: "very_high"
+    elasticity_profile: "low"
+    covid_lag_months: 1
+
+  household_goods:
+    category: "consumer_staple"
+    epidemic_sensitivity: "high"     # supply chain + demand hoarding
+    elasticity_profile: "medium"
+    covid_lag_months: 2
+
+  medical_services:
+    category: "service"
+    epidemic_sensitivity: "extreme"  # direct utilization surge
+    elasticity_profile: "very_low"
+    covid_lag_months: 0
+
+  apparel:
+    category: "consumer_discretionary"
+    epidemic_sensitivity: "high"
+    elasticity_profile: "medium_high"
+    covid_lag_months: 2
