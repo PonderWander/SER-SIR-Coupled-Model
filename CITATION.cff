@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "epi_market_sim"
+title: "SER-SIR-Coupled-Model"
 message: "If you use this project, please cite the paper and repository."
 authors:
   - family-names: "Castle"
