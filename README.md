@@ -1,4 +1,4 @@
-# epi_market_sim
+# SER-SIR-Coupled-Model
 
 **Epidemic–Market Simulation Pipeline**
 
@@ -9,6 +9,15 @@ Built to support the research paper:
 > [SSRN preprint — https://dx.doi.org/10.2139/ssrn.6561918](https://dx.doi.org/10.2139/ssrn.6561918)
 
 ---
+
+## Quick Summary
+
+This project implements a coupled systems model combining:
+
+- SER (economic/systemic pressure layer)
+- SIR-style propagation dynamics
+
+The goal is to explore how stress and behavior propagate across interconnected systems.
 
 ## Detailed Report
 
