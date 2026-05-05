@@ -5,8 +5,8 @@
 A coupled simulation framework that models how epidemic forcing propagates through sectoral economic networks, decomposes stress leakage into market and household exit channels, and identifies the structural regime boundary between them.
 
 Built to support the research paper:
-> *Household Infrastructure Stabilization as a Structural Economic Resilience Mechanism*
-> [SSRN preprint — dx.doi.org/10.2139/ssrn.6174978](https://dx.doi.org/10.2139/ssrn.6174978)
+> *A Formal Specification of the SER (Stress-Elasticity-Reaction) Framework*
+> [SSRN preprint — https://dx.doi.org/10.2139/ssrn.6561918](https://dx.doi.org/10.2139/ssrn.6561918)
 
 ---
 
@@ -290,6 +290,5 @@ Research code — see LICENSE for terms.
 If you use this simulation framework, please cite the associated paper:
 
 ```
-Household Infrastructure Stabilization as a Structural Economic Resilience Mechanism
-SSRN preprint: https://dx.doi.org/10.2139/ssrn.6174978
+See CITATION.cff
 ```
