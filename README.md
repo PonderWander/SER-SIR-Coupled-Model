@@ -285,6 +285,14 @@ Research code — see LICENSE for terms.
 
 ---
 
+## Attribution & Use
+
+This repository implements the model described in the accompanying research paper.
+
+If you use, adapt, or build upon this work, please cite the paper and reference this repository.
+
+The goal of this project is open collaboration and continued exploration of the framework.
+
 ## Citation
 
 If you use this simulation framework, please cite the associated paper:
