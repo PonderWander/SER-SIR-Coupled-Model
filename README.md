@@ -198,7 +198,6 @@ epi_market_sim/
 ├── ARCHITECTURE.md                  # Full system design and equations
 ├── CHANGES.md                       # Changelog from initial state
 ├── USAGE.md                         # Detailed usage guide
-├── TRANSCRIPT.md                    # Analytical session log
 ├── configs/
 │   ├── base_config.yaml             # SER parameters, connectivity mode
 │   ├── sector_graph.yaml            # 10-sector graph topology
