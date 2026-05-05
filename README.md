@@ -12,7 +12,7 @@ Built to support the research paper:
 
 ## Detailed Report
 
-The full analysis and detailed report can be found [here](paper/Coupled%20Epidemic%20and%20Economic%20Constraint%20Dynamics%3A%20A%20SER-SIR%20Framework%20with%20Market%20and%20Household%20Leakage%20Regimes.pdf)
+The full analysis and detailed report can be found [here](paper/Coupled%20Epidemic%20and%20Economic%20Constraint%20Dynamics%3A%20A%20SER-SIR%20Framework%20with%20Market%20and%20Household%20Leakage%20Regimes.pdf).
 
 ## What This Models
 
